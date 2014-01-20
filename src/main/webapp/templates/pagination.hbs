@@ -1,0 +1,48 @@
+<script type="text/x-handlebars" data-template-name="components/pagina-data">
+	<ul class="pagination">
+		
+		{{#if first}}
+			<li class="disabled"><a>&laquo;</a></li>
+        {{else}}
+          <li class=""><a href="#" {{action "selectPage" 1 paginationparam.order}}>&laquo;</a></li>
+        {{/if}}
+		
+
+		
+        {{#if prevPage}}
+          <li class=""><a href="#" {{action "selectPage" prevPage paginationparam.order}}>&lsaquo;</a></li>
+        {{else}}
+          <li class="disabled"><a>&lsaquo;</a></li>
+        {{/if}}
+		
+
+		{{#each paginas}}
+				 {{#if activo}} 
+					<li class="active">
+						<a>{{number}} <span class="sr-only">(current)</span></a>
+					</li>
+        		{{else}}
+				    <li>
+          				<a href="#" {{action "selectPage" number orden}}>{{number}}</a>
+					</li>
+        		{{/if}}
+			
+		{{/each}}
+
+        {{#if nextPage}}
+          <li class=""><a href="#" {{action "selectPage" nextPage paginationparam.order}}>&rsaquo;</a></li>
+        {{else}}
+          <li class="disabled"><a>&rsaquo;</a></li>
+        {{/if}}
+
+
+		{{#if last}}
+		  <li class="disabled"><a>&raquo;</a></li>
+        {{else}}
+          <li class=""><a href="#" {{action "selectPage" totalPages paginationparam.order}}>&raquo;</a></li>
+        {{/if}}
+
+		
+	</ul>
+
+  </script>    

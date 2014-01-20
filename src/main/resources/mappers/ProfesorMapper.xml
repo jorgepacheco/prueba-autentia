@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE mapper
+     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+     
+<mapper namespace="org.jpacheco.rest.spring.mapper.ProfesorMapper">
+	
+	<resultMap type="org.jpacheco.rest.spring.bean.Profesor" id="profesorResult">
+		<id column="id_profesor" property="id" javaType="int"/>
+	    <result column="nombre" property="nombre" javaType="string"/>
+	    <result column="apellidos" property="apellidos" javaType="string"/>
+	</resultMap>
+
+	<resultMap type="org.jpacheco.rest.spring.bean.Profesor" id="profesorResultCursos">
+		<id column="id_profesor" property="id" javaType="int"/>
+	    <result column="nombre" property="nombre" javaType="string"/>
+	    <result column="apellidos" property="apellidos" javaType="string"/>
+	    <collection property="cursos" javaType="ArrayList" ofType="org.jpacheco.rest.spring.bean.Curso"
+	    column="id" resultMap="org.jpacheco.rest.spring.mapper.CursosMapper.cursoResult"/>
+	</resultMap>
+	
+	
+	<sql id="selectProfesores">
+    		select id_profesor, nombre, apellidos from profesores
+    </sql>
+    
+	<select id="getAll" resultMap="profesorResult">
+    		<include refid="selectProfesores"/>
+    </select>
+
+	<select id="getAutorWithTutoriales" parameterType="int" resultMap="profesorResultCursos">
+		select profesores.id_profesor, nombre, apellidos, id_curso, titulo, activo, nivel, horas 
+		from profesores inner join cursos on profesores.id_profesor = cursos.id_profesor 
+		where cursos.id_profesor = #{id_profesor}
+	</select>
+	
+
+		
+</mapper> 

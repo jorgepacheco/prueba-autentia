@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE mapper
+     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+     
+<mapper namespace="org.jpacheco.rest.spring.mapper.CursosMapper">
+	
+	<cache/>
+	
+	<resultMap type="org.jpacheco.rest.spring.bean.Curso" id="cursoResult">
+		<id column="id_curso" property="id" javaType="int"/>
+	    <result column="titulo" property="titulo" javaType="string"/>
+	    <result column="nivel" property="nivel" javaType="string"/>
+	    <result column="horas" property="horas" javaType="int"/>
+	    <result column="activo" property="activo" javaType="boolean"/>
+	    <result column="temario" property="file" javaType="_byte[]"/>
+	    <result column="filename" property="fileName" javaType="string"/>
+	    <association property="profesor" column="id_profesor" resultMap="org.jpacheco.rest.spring.mapper.ProfesorMapper.profesorResult"/> 
+	</resultMap>
+	
+    
+    <sql id="selectTutoriales">
+    		select id_curso, titulo, nivel, horas, activo, temario, filename, cursos.id_profesor, nombre, apellidos
+		from cursos INNER JOIN profesores ON cursos.id_profesor = profesores.id_profesor
+    </sql>
+    
+    <select id="getAll" resultMap="cursoResult">
+    		<include refid="selectTutoriales"/>
+    </select>
+    
+    <select id="getCursoById" parameterType="int" resultMap="cursoResult">
+		<include refid="selectTutoriales"/> where id_curso = #{id}
+	</select>     
+    
+    <select id="getCountActiveCourses" parameterType="boolean" resultType="int">
+		select count(*) from cursos where activo = #{activo}
+	</select> 
+    
+    <select id="getActiveCourses" parameterType="boolean" resultMap="cursoResult">
+		<include refid="selectTutoriales"/> where activo = #{activo}
+	</select> 
+	
+    <select id="getActiveCoursesPag" parameterType="map" resultMap="cursoResult">
+		<include refid="selectTutoriales"/> where activo = #{activo} order by upper(titulo) ${order}
+	</select> 
+    
+    
+    <insert id="insert" parameterType="org.jpacheco.rest.spring.bean.Curso" useGeneratedKeys="true" keyProperty="id" keyColumn="id_curso">
+		<selectKey keyProperty="id" resultType="int" order="BEFORE">
+			SELECT nextval('seq_id_curso')
+		</selectKey>
+		insert into cursos (id_curso, titulo, activo, nivel, horas, id_profesor, temario, filename) 
+		values (#{id}, #{titulo}, #{activo}, #{nivel}, #{horas}, #{profesor.id}, #{file}, #{fileName})
+	</insert>
+	
+
+</mapper> 

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+
+    <title>Ember + Spring MVC + MyBatis</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <link href="css/theme.css" rel="stylesheet">
+
+  </head>
+
+<!-- NAVBAR
+================================================== -->
+  <body>
+
+  <script type="text/x-handlebars" data-template-name="application">
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          
+			 {{#linkTo "index" classNames="navbar-brand"}}Aplicacion Cursos{{/linkTo}} 
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li>
+                {{#linkTo "course"}}Cursos{{/linkTo}}  
+            </li>
+            <li>
+              {{#linkTo "newcourse"}}Nuevo{{/linkTo}}  
+            </li>
+
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    {{outlet}}
+</script>
+  
+ <script type="text/x-handlebars" data-template-name="index">
+<div class="container">
+<div class="jumbotron">
+  <h2>Prueba Técnica con Autentia</h2>
+  <p>Tecnologías empleadas: Ember, MyBatis, Spring MVC, jQuery y Bootstrap</p>
+</div>
+</div>
+</script>
+<script type="text/x-handlebars" data-template-name="course">
+
+<div class="container">
+	<div class="row">
+  			<div class="col-md-8 col-md-offset-2">
+				<div class="panel panel-primary">
+  					<div class="panel-heading">Catálogo de Cursos</div>
+  					<div class="panel-body">
+
+    <table class="table table-bordered">
+            <thead>
+              <tr>
+
+                <th>
+					{{#order-data  ordenp=model.pagination.order action="find"}}
+					
+					{{/order-data}}
+				</th>
+                <th>Horas</th>
+                <th>Nivel</th>
+				<th>Profesor</th>
+				<th>Temario</th>
+              </tr>
+            </thead>
+            <tbody>
+  			{{#each model.cursos}}
+              <tr>
+ 
+                <td>{{titulo}}</td>
+                <td>{{nivel}}</td>
+                <td>{{horas}}</td>
+ 				<td>{{profesor.nombre}}</td>
+
+ 				<td>
+				{{#if fileName}}
+					
+    				{{#enlace-item enlaceid=id}}      
+    				{{/enlace-item}}
+				{{else}}
+						--
+ 				{{/if}}
+				</td>
+              </tr>
+			{{/each}}
+            </tbody>
+          </table>    
+
+	<p><button {{action 'gotoNewCourse'}} class="btn btn-primary">Nuevo Curso</button> </p>
+
+   {{#pagina-data paginationparam=model.pagination action="find"}}
+      
+    {{/pagina-data}}
+ 
+  					</div>
+				</div>
+			</div>
+	</div>
+</div>
+
+</script>
+
+
+<script type="text/x-handlebars" data-template-name="newcourse">
+  
+<div class="container">
+ {{#if errorMsg}}
+	<div class="row">
+  			<div class="col-md-8 col-md-offset-2">
+				<div class="alert alert-danger alert-dismissable">
+  					<button type="button" class="close" data-dismiss="alert">&times;</button>
+  					<strong>{{errorMsg}}</strong>
+				</div>
+			</div>
+	</div>
+ {{/if}}
+	<div class="row">
+  			<div class="col-md-8 col-md-offset-2">
+				<div class="panel panel-primary">
+  					<div class="panel-heading">Añadir Curso</div>
+  					<div class="panel-body">
+						<div class="row">
+    						<div class="col-md-10 col-md-offset-1">
+<form role="form">
+  <div class="checkbox form-group">
+    <label for="ejemplo_activo">
+      	{{view Ember.Checkbox checkedBinding="activo"}} Activo
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label for="ejemplo_password_1">Autor</label>
+
+		{{view Ember.Select content=App.profesores selection=profesor optionValuePath="content.id"  optionLabelPath="content.nombre" 
+			classNames="form-control" prompt="Seleccione un profesor"}}
+
+  </div>    
+
+  <div class="form-group">
+    <label for="ejemplo_email_1">Titulo</label>
+	
+	{{input type="text" name="titulo" valueBinding="titulo" class="form-control" placeholder="Introduce titulo del curso" id="ejemplo_email_1"}}
+
+  
+  </div>
+
+  <div class="form-group">
+    <label for="ejemplo_password_1">Nivel</label>
+
+	{{view Ember.Select content=niveles selection=nivel classNames="form-control"}}
+
+  </div>
+
+
+  <div class="form-group">
+    <label for="ejemplo_email_1">Horas</label>
+	
+	{{view App.NumberField valueBinding="horas" min="1" classNames="form-control"}}
+    
+  </div>
+
+  <div class="form-group">
+	
+		{{view App.UploadFileView name="logo" contentBinding="content"}}
+	
+  </div>
+
+  <p> <button {{action 'save'}} class="btn btn-primary">Añadir</button> </p>
+ 
+</form>
+
+
+
+							</div>
+						</div>
+  					</div>
+				</div>
+			</div>
+	</div>
+</div>
+
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/enlace-item">
+						<span class="glyphicon glyphicon-download-alt"></span>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/pagina-data">
+	<ul class="pagination">
+		
+		{{#if first}}
+			<li class="disabled"><a>&laquo;</a></li>
+        {{else}}
+          <li class=""><a href="#" {{action "selectPage" 1 paginationparam.order}}>&laquo;</a></li>
+        {{/if}}
+		
+
+		
+        {{#if prevPage}}
+          <li class=""><a href="#" {{action "selectPage" prevPage paginationparam.order}}>&lsaquo;</a></li>
+        {{else}}
+          <li class="disabled"><a>&lsaquo;</a></li>
+        {{/if}}
+		
+
+		{{#each paginas}}
+				 {{#if activo}} 
+					<li class="active">
+						<a>{{number}} <span class="sr-only">(current)</span></a>
+					</li>
+        		{{else}}
+				    <li>
+          				<a href="#" {{action "selectPage" number orden}}>{{number}}</a>
+					</li>
+        		{{/if}}
+			
+		{{/each}}
+
+        {{#if nextPage}}
+          <li class=""><a href="#" {{action "selectPage" nextPage paginationparam.order}}>&rsaquo;</a></li>
+        {{else}}
+          <li class="disabled"><a>&rsaquo;</a></li>
+        {{/if}}
+
+
+		{{#if last}}
+		  <li class="disabled"><a>&raquo;</a></li>
+        {{else}}
+          <li class=""><a href="#" {{action "selectPage" totalPages paginationparam.order}}>&raquo;</a></li>
+        {{/if}}
+
+		
+	</ul>
+
+  </script>    
+
+
+    <script src="js/libs/jquery-1.10.2.js"></script>
+    <script src="js/libs/bootstrap.min.js"></script>
+    <script src="js/libs/handlebars-1.1.2.js"></script>
+    <script src="js/libs/ember-1.2.0.js"></script> 
+    <script src="js/app.js"></script>  
+    <script src="js/routes/routes.js"></script>  
+    <script src="js/components/component.js"></script>
+    <script src="js/models/model.js"></script>   
+    <script src="js/controllers/controller.js"></script>
+    
+
+    <script type="text/javascript">
+
+	$(document).ready(function() {
+		
+		$.postJSON = function(url, data, callback) {
+		    return $.ajax({
+		    'type': 'POST',
+		    'url': url,
+		    'contentType': 'application/json',
+		    'data': data,
+		    'dataType': 'json',
+		    'success': callback
+		    });
+		};
+
+	});
+    </script>
+  </body>
+</html>
